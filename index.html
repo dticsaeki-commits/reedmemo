@@ -1,240 +1,539 @@
-<!-- 最初に読んだ本 セクション（ここを index.html の適当な場所に貼ってください） -->
-<section id="firstBookSection" style="margin:20px 0; padding:14px; border:1px dashed #ddd; border-radius:10px; background:#fff;">
-  <h2 style="margin:0 0 10px;">最初に読んだ本</h2>
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>読後メモ：ランダム6問</title>
+  <style>
+    :root { --w: 900px; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", sans-serif; margin: 24px; line-height: 1.5; background:#f6f7f8;}
+    .wrap { max-width: var(--w); margin: 0 auto; }
+    h1 { font-size: 22px; margin: 0 0 12px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 12px 0 18px; }
+    button { padding: 10px 12px; border: 1px solid #ccc; border-radius: 10px; background: #fff; cursor: pointer; }
+    button:hover { background: #f6f6f6; }
+    .pill { font-size: 12px; padding: 4px 10px; border: 1px solid #ddd; border-radius: 999px; background: #fafafa; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 820px){ .grid{ grid-template-columns: 1fr; } }
+    .card { border: 1px solid #e2e2e2; border-radius: 14px; padding: 14px; background:#fff; }
+    .qhead { display:flex; justify-content: space-between; align-items:center; gap: 10px; }
+    .qtitle { font-weight: 700; margin: 0; font-size: 15px; }
+    textarea { width: 100%; min-height: 74px; margin-top: 10px; padding: 10px; border-radius: 12px; border: 1px solid #d7d7d7; resize: vertical; }
+    .small { font-size: 12px; color: #666; margin-top: 10px; }
+    .resultWrap { margin-top: 22px; }
+    .resultCard { border: 2px solid #111; border-radius: 16px; padding: 16px; background: #fff; }
+    .resultTitle { display:flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+    .resultTitle h2 { margin: 0; font-size: 18px; }
+    .meta { font-size: 12px; color: #444; }
+    .resultItem { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #bbb; }
+    .resultItem .label { font-size: 12px; color: #666; }
+    .resultItem .q { font-weight: 700; margin: 4px 0 6px; }
+    .resultItem .a { white-space: pre-wrap; }
+    .hint { font-size: 12px; color: #777; margin-top: 6px; }
+    #btnCopySeed { font-size: 13px; }
 
-  <div id="fb-view" style="display:none; align-items:center; gap:12px;">
-    <img id="fb-cover" src="" alt="cover" style="width:96px;height:140px;object-fit:cover;border-radius:6px;border:1px solid #ccc;">
-    <div>
-      <div id="fb-info" style="font-weight:700"></div>
-      <div id="fb-sub" style="color:#666;margin-top:6px"></div>
-      <div style="margin-top:10px;">
-        <button id="fb-edit" type="button">編集</button>
-        <button id="fb-clear" type="button">削除</button>
+    /* --- first book styles --- */
+    #firstBookSection { margin: 18px 0; padding: 12px; border-radius: 12px; background: #fff; border:1px solid #e6e6e6; display:flex; gap:14px; align-items:flex-start; }
+    #fb-cover { width:84px; height:120px; object-fit:cover; border-radius:6px; border:1px solid #ddd; background:#fafafa; }
+    #fb-form input { width:100%; box-sizing:border-box; padding:8px; border-radius:6px; border:1px solid #d7d7d7; }
+    #fb-form button { width:100%; }
+    #fb-view { display:flex; gap:12px; align-items:center; }
+    .fb-info { font-weight:700; }
+    .fb-sub { color:#666; font-size:13px; margin-top:6px; }
+    .fb-actions button { margin-right:8px; }
+    @media (max-width:820px){ #firstBookSection{flex-direction:column; align-items:stretch;} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>読後メモ（ランダム6問）</h1>
+
+    <!-- ===== 最初に読んだ本 セクション ===== -->
+    <section id="firstBookSection" aria-label="最初に読んだ本">
+      <div id="fb-view" style="display:none;">
+        <img id="fb-cover" src="" alt="cover">
+        <div>
+          <div id="fb-info" class="fb-info"></div>
+          <div id="fb-sub" class="fb-sub"></div>
+          <div style="margin-top:10px;" class="fb-actions">
+            <button id="fb-edit" type="button">編集</button>
+            <button id="fb-clear" type="button">削除</button>
+          </div>
+        </div>
+      </div>
+
+      <form id="fb-form" style="display:grid; grid-template-columns:1fr 160px; gap:10px; align-items:start;">
+        <div>
+          <label style="display:block;font-size:13px;color:#333;">タイトル</label>
+          <input id="fb-title" type="text" placeholder="書名を入力">
+          <label style="display:block;font-size:13px;color:#333;margin-top:8px;">著者</label>
+          <input id="fb-author" type="text" placeholder="著者名（任意）">
+          <label style="display:block;font-size:13px;color:#333;margin-top:8px;">ISBN（任意）</label>
+          <input id="fb-isbn" type="text" placeholder="ISBN（ハイフン可）">
+          <div style="margin-top:8px;color:#555;font-size:13px;">※ Open Library / Google Books で書影を取得します</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column; gap:8px;">
+          <button id="fb-fetch" type="button">カバーを取得</button>
+          <button id="fb-save" type="button">保存</button>
+          <div id="fb-status" style="color:#666;font-size:13px;"></div>
+        </div>
+      </form>
+    </section>
+    <!-- ===== /最初に読んだ本 ===== -->
+
+    <div class="row">
+      <button id="btnDraw" type="button">6問を引き直す</button>
+      <button id="btnMake" type="button">結果カードを作る</button>
+      <button id="btnPng" type="button">結果をPNGで保存</button>
+      <span class="pill">人物×2 / 展開×2 / 外側×2</span>
+      <span class="pill" id="seedInfo" aria-live="polite"></span>
+      <button id="btnCopySeed" type="button" aria-label="現在のページのパーマリンクをコピー">パーマリンクをコピー</button>
+    </div>
+
+    <div class="grid" id="questions"></div>
+
+    <div class="resultWrap">
+      <div class="hint">「結果カードを作る」→内容確認 →「PNGで保存」で画像化できます。</div>
+      <div id="resultArea" class="resultCard" style="margin-top:12px; display:none;">
+        <div class="resultTitle">
+          <h2>読後メモ（結果）</h2>
+          <div class="meta" id="meta"></div>
+        </div>
+        <div id="resultBody"></div>
       </div>
     </div>
   </div>
 
-  <form id="fb-form" style="display:grid; grid-template-columns:1fr 120px; gap:10px; align-items:start;">
-    <div>
-      <label style="display:block;font-size:13px;color:#333;">タイトル</label>
-      <input id="fb-title" type="text" placeholder="書名を入力" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;">
-      <label style="display:block;font-size:13px;color:#333;margin-top:8px;">著者</label>
-      <input id="fb-author" type="text" placeholder="著者名（任意）" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;">
-      <label style="display:block;font-size:13px;color:#333;margin-top:8px;">ISBN（任意）</label>
-      <input id="fb-isbn" type="text" placeholder="ISBN（ハイフン可）" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;">
-      <div style="margin-top:8px;color:#555;font-size:13px;">
-        ※ Open Library / Google Books を使って書影を取得します
-      </div>
-    </div>
+  <!-- html2canvas (画像化用) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-    <div style="display:flex;flex-direction:column; gap:8px;">
-      <button id="fb-fetch" type="button" style="padding:10px;border-radius:8px;">カバーを取得</button>
-      <button id="fb-save" type="button" style="padding:10px;border-radius:8px;">保存</button>
-      <div id="fb-status" style="color:#666;font-size:13px;"></div>
-    </div>
-  </form>
-</section>
+  <script>
+  // ========= first-book logic (Open Library / Google Books) =========
+  (function(){
+    const qs = (s) => document.querySelector(s);
+    const fbTitle = qs('#fb-title');
+    const fbAuthor = qs('#fb-author');
+    const fbIsbn = qs('#fb-isbn');
+    const fbFetch = qs('#fb-fetch');
+    const fbSave = qs('#fb-save');
+    const fbStatus = qs('#fb-status');
+    const fbCoverImg = qs('#fb-cover');
+    const fbView = qs('#fb-view');
+    const fbForm = qs('#fb-form');
+    const fbInfo = qs('#fb-info');
+    const fbSub = qs('#fb-sub');
+    const fbEdit = qs('#fb-edit');
+    const fbClear = qs('#fb-clear');
 
-<script>
-(function(){
-  const qs = (s) => document.querySelector(s);
-  const fbTitle = qs('#fb-title');
-  const fbAuthor = qs('#fb-author');
-  const fbIsbn = qs('#fb-isbn');
-  const fbFetch = qs('#fb-fetch');
-  const fbSave = qs('#fb-save');
-  const fbStatus = qs('#fb-status');
-  const fbCoverImg = qs('#fb-cover');
-  const fbView = qs('#fb-view');
-  const fbForm = qs('#fb-form');
-  const fbInfo = qs('#fb-info');
-  const fbSub = qs('#fb-sub');
-  const fbEdit = qs('#fb-edit');
-  const fbClear = qs('#fb-clear');
+    const STORAGE_KEY = 'reading_memo_first_book_v1';
 
-  const STORAGE_KEY = 'reading_memo_first_book';
+    function imageExists(url){
+      return new Promise((res) => {
+        if(!url) return res(false);
+        const img = new Image();
+        img.onload = () => res(true);
+        img.onerror = () => res(false);
+        img.src = url + (url.indexOf('?') === -1 ? '?cache=' + Date.now() : '&cache=' + Date.now());
+      });
+    }
 
-  // 画像存在チェック用（Image オブジェクト）
-  function imageExists(url){
-    return new Promise((res) => {
-      const img = new Image();
-      img.onload = () => res(true);
-      img.onerror = () => res(false);
-      img.src = url + (url.indexOf('?') === -1 ? '?cache=' + Date.now() : '&cache=' + Date.now());
-    });
-  }
+    async function tryOpenLibraryIsbn(isbn){
+      if(!isbn) return null;
+      const norm = isbn.replace(/[^0-9Xx]/g, '');
+      const url = `https://covers.openlibrary.org/b/isbn/${norm}-L.jpg`;
+      if(await imageExists(url)) return url;
+      return null;
+    }
 
-  // Open Library: ISBN カバー
-  async function tryOpenLibraryIsbn(isbn){
-    if(!isbn) return null;
-    const norm = isbn.replace(/[^0-9Xx]/g, '');
-    const url = `https://covers.openlibrary.org/b/isbn/${norm}-L.jpg`;
-    if(await imageExists(url)) return url;
-    return null;
-  }
-
-  // Open Library: 検索（title/author）
-  async function tryOpenLibrarySearch(title, author){
-    if(!title) return null;
-    const q = encodeURIComponent(title + (author ? ' ' + author : ''));
-    try {
-      const res = await fetch(`https://openlibrary.org/search.json?q=${q}&limit=5`);
-      if(!res.ok) return null;
-      const data = await res.json();
-      if(data.docs && data.docs.length){
-        // できるだけ cover_i を使う
-        for(const d of data.docs){
-          if(d.cover_i){
-            const url = `https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`;
-            if(await imageExists(url)) return url;
-          }
-          if(d.isbn && d.isbn.length){
-            // try first ISBN
-            const tryIsbn = d.isbn[0];
-            const byIsbn = await tryOpenLibraryIsbn(tryIsbn);
-            if(byIsbn) return byIsbn;
+    async function tryOpenLibrarySearch(title, author){
+      if(!title) return null;
+      const q = encodeURIComponent(title + (author ? ' ' + author : ''));
+      try {
+        const res = await fetch(`https://openlibrary.org/search.json?q=${q}&limit=5`);
+        if(!res.ok) return null;
+        const data = await res.json();
+        if(data.docs && data.docs.length){
+          for(const d of data.docs){
+            if(d.cover_i){
+              const url = `https://covers.openlibrary.org/b/id/${d.cover_i}-L.jpg`;
+              if(await imageExists(url)) return url;
+            }
+            if(d.isbn && d.isbn.length){
+              const tryIsbn = d.isbn[0];
+              const byIsbn = await tryOpenLibraryIsbn(tryIsbn);
+              if(byIsbn) return byIsbn;
+            }
           }
         }
-      }
-    } catch(e){ /* ignore */ }
-    return null;
-  }
+      } catch(e){ /* ignore */ }
+      return null;
+    }
 
-  // Google Books: search
-  async function tryGoogleBooks(title, author, isbn){
-    try {
-      let url = null;
+    async function tryGoogleBooks(title, author, isbn){
+      try {
+        let url = null;
+        if(isbn){
+          const norm = isbn.replace(/[^0-9Xx]/g, '');
+          url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${encodeURIComponent(norm)}`;
+        } else {
+          let q = title;
+          if(author) q += ' ' + author;
+          url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=5`;
+        }
+        const res = await fetch(url);
+        if(!res.ok) return null;
+        const data = await res.json();
+        if(data.totalItems > 0 && data.items && data.items.length){
+          for(const item of data.items){
+            const img = item.volumeInfo?.imageLinks;
+            if(img && (img.large || img.thumbnail || img.smallThumbnail)){
+              const found = img.large || img.thumbnail || img.smallThumbnail;
+              if(await imageExists(found)) return found;
+            }
+          }
+        }
+      } catch(e){ /* ignore */ }
+      return null;
+    }
+
+    async function fetchCover(){
+      fbStatus.textContent = '検索中…';
+      const title = fbTitle.value.trim();
+      const author = fbAuthor.value.trim();
+      const isbn = fbIsbn.value.trim();
+      let cover = null;
+
       if(isbn){
-        const norm = isbn.replace(/[^0-9Xx]/g, '');
-        url = `https://www.googleapis.com/books/v1/volumes?q=isbn:${encodeURIComponent(norm)}`;
+        cover = await tryOpenLibraryIsbn(isbn);
+      }
+      if(!cover && title){
+        cover = await tryOpenLibrarySearch(title, author);
+      }
+      if(!cover){
+        cover = await tryGoogleBooks(title, author, isbn);
+      }
+
+      if(cover){
+        fbCoverImg.src = cover;
+        fbStatus.textContent = 'カバーを取得しました。プレビューを確認して「保存」を押してください。';
       } else {
-        let q = title;
-        if(author) q += ' ' + author;
-        url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=5`;
+        fbCoverImg.src = '';
+        fbStatus.textContent = 'カバーが見つかりませんでした。ISBN を入れるか、手動で画像URLを差し替えてください。';
       }
-      const res = await fetch(url);
-      if(!res.ok) return null;
-      const data = await res.json();
-      if(data.totalItems > 0 && data.items && data.items.length){
-        for(const item of data.items){
-          const img = item.volumeInfo?.imageLinks;
-          if(img && (img.large || img.thumbnail || img.smallThumbnail)){
-            // prefer large
-            const found = img.large || img.thumbnail || img.smallThumbnail;
-            if(await imageExists(found)) return found;
-          }
-        }
+      return cover;
+    }
+
+    function renderSaved(book){
+      if(!book){
+        fbView.style.display = 'none';
+        fbForm.style.display = 'grid';
+        return;
       }
-    } catch(e){ /* ignore */ }
-    return null;
-  }
-
-  async function fetchCover(){
-    fbStatus.textContent = '検索中…';
-    const title = fbTitle.value.trim();
-    const author = fbAuthor.value.trim();
-    const isbn = fbIsbn.value.trim();
-    let cover = null;
-
-    // 1) ISBN Open Library
-    if(isbn){
-      cover = await tryOpenLibraryIsbn(isbn);
-    }
-    // 2) Open Library search
-    if(!cover && title){
-      cover = await tryOpenLibrarySearch(title, author);
-    }
-    // 3) Google Books fallback
-    if(!cover){
-      cover = await tryGoogleBooks(title, author, isbn);
-    }
-
-    if(cover){
-      fbCoverImg.src = cover;
-      fbStatus.textContent = 'カバーを取得しました。プレビューを確認して「保存」を押してください。';
-    } else {
-      fbCoverImg.src = '';
-      fbStatus.textContent = 'カバーが見つかりませんでした。ISBN を入れるか、手動で画像URLを差し替えてください。';
-    }
-    return cover;
-  }
-
-  // 表示切替（保存済みの表示）
-  function renderSaved(book){
-    if(!book){
-      fbView.style.display = 'none';
-      fbForm.style.display = 'grid';
-      return;
-    }
-    fbForm.style.display = 'none';
-    fbView.style.display = 'flex';
-    fbCoverImg.src = book.cover || '';
-    fbInfo.textContent = book.title || '';
-    fbSub.textContent = [book.author || '', book.isbn ? ('ISBN: ' + book.isbn) : ''].filter(Boolean).join(' / ');
-  }
-
-  // 保存・読み込み
-  function saveBook(book){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(book));
-  }
-  function loadBook(){
-    try {
-      const v = localStorage.getItem(STORAGE_KEY);
-      return v ? JSON.parse(v) : null;
-    } catch(e){ return null; }
-  }
-  function clearBook(){
-    localStorage.removeItem(STORAGE_KEY);
-  }
-
-  // イベント
-  fbFetch.addEventListener('click', async () => {
-    await fetchCover();
-  });
-
-  fbSave.addEventListener('click', async () => {
-    // もしまだカバーが空なら先に取得する
-    if(!fbCoverImg.src){
-      await fetchCover();
-    }
-    const book = {
-      title: fbTitle.value.trim(),
-      author: fbAuthor.value.trim(),
-      isbn: fbIsbn.value.trim(),
-      cover: fbCoverImg.src || ''
-    };
-    if(!book.title){
-      fbStatus.textContent = 'タイトルを入力してください。';
-      return;
-    }
-    saveBook(book);
-    renderSaved(book);
-    fbStatus.textContent = '保存しました。';
-  });
-
-  fbEdit.addEventListener('click', () => {
-    const book = loadBook();
-    if(book){
-      fbTitle.value = book.title || '';
-      fbAuthor.value = book.author || '';
-      fbIsbn.value = book.isbn || '';
+      fbForm.style.display = 'none';
+      fbView.style.display = 'flex';
       fbCoverImg.src = book.cover || '';
+      fbInfo.textContent = book.title || '';
+      fbSub.textContent = [book.author || '', book.isbn ? ('ISBN: ' + book.isbn) : ''].filter(Boolean).join(' / ');
     }
-    renderSaved(null);
-    fbStatus.textContent = '編集モードです。変更して「保存」してください。';
-  });
 
-  fbClear.addEventListener('click', () => {
-    if(!confirm('本当に削除しますか？')) return;
-    clearBook();
-    renderSaved(null);
-    fbStatus.textContent = '削除しました。';
-  });
+    function saveBook(book){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(book));
+    }
+    function loadBook(){
+      try {
+        const v = localStorage.getItem(STORAGE_KEY);
+        return v ? JSON.parse(v) : null;
+      } catch(e){ return null; }
+    }
+    function clearBook(){
+      localStorage.removeItem(STORAGE_KEY);
+    }
 
-  // 初期ロード
-  document.addEventListener('DOMContentLoaded', () => {
-    const book = loadBook();
-    renderSaved(book);
-  });
-})();
-</script>
+    fbFetch.addEventListener('click', async () => {
+      await fetchCover();
+    });
+
+    fbSave.addEventListener('click', async () => {
+      if(!fbCoverImg.src){
+        await fetchCover();
+      }
+      const book = {
+        title: fbTitle.value.trim(),
+        author: fbAuthor.value.trim(),
+        isbn: fbIsbn.value.trim(),
+        cover: fbCoverImg.src || ''
+      };
+      if(!book.title){
+        fbStatus.textContent = 'タイトルを入力してください。';
+        return;
+      }
+      saveBook(book);
+      renderSaved(book);
+      fbStatus.textContent = '保存しました。';
+    });
+
+    fbEdit.addEventListener('click', () => {
+      const book = loadBook();
+      if(book){
+        fbTitle.value = book.title || '';
+        fbAuthor.value = book.author || '';
+        fbIsbn.value = book.isbn || '';
+        fbCoverImg.src = book.cover || '';
+      }
+      renderSaved(null);
+      fbStatus.textContent = '編集モードです。変更して「保存」してください。';
+    });
+
+    fbClear.addEventListener('click', () => {
+      if(!confirm('本当に削除しますか？')) return;
+      clearBook();
+      renderSaved(null);
+      fbStatus.textContent = '削除しました。';
+    });
+
+    // 初期ロード
+    const initBook = loadBook();
+    renderSaved(initBook);
+
+    // expose a helper for result creation
+    window.__readingMemo_firstBook = function(){
+      return loadBook();
+    };
+  })();
+
+
+  // ========= 90問（人物30 / 展開30 / 外側30） =========
+  (function(){
+    const people = [
+      "友達になりたい登場人物","なんとなく放っておけなかった登場人物","いちばん感情を動かされた登場人物",
+      "最初は好きじゃなかったけど慣れた登場人物","出番は少ないのに覚えている登場人物",
+      "近所にいたら避けたい登場人物","実際に会ったら気まずそうな登場人物","現実にいたら「関わらないでおこう」と思う登場人物",
+      "自分とは絶対合わない人物","いちばん感情移入しなかった登場人物",
+      "正直いちばん信用できなかった人物","何を考えているのか最後まで分からなかった登場人物",
+      "行動は理解できないけど嫌いになれない登場人物","逆に、気持ちは分からないけど行動は理解できる登場人物",
+      "行動は間違ってそうだけど気持ちは分かる登場人物",
+      "途中で印象が一番変わった登場人物","最初は好きだったけど距離ができた登場人物","読み終えてから評価が変わった登場人物",
+      "一言だけで性格が分かった気がする登場人物","この人の選択だけは忘れられない登場人物",
+      "物語からいなくなったら困る人物","いなくなっても話が進みそうな人物","一番損してる気がする人物",
+      "この人が出てくると空気が変わる登場人物","物語の外に出たら弱そうな登場人物",
+      "自分に一番近い性格の人物","この人の視点でもう一度読みたい登場人物","物語が終わったあと、どうしているか気になる登場人物",
+      "何もしてないのに印象に残ってる人物","物語の外に出ても強そうな登場人物"
+    ];
+
+    const plot = [
+      "読んでいて「先が気になった」展開","気づいたらページが進んでいた展開","読んでいて「流れに乗れた」と感じた展開",
+      "逆に、流れが途切れたと感じた展開","ちょっと長いと感じた展開",
+      "話が大きく動いたと感じたところ","ここから話が変わった気がする展開","話が戻ったと感じた展開",
+      "話が収束し始めたと感じた展開","ここで終わってもおかしくないと思った展開",
+      "正直、予想と違った展開","「そう来る？」と思った展開","読みながら気持ちが追いつかなかった展開",
+      "なんとなく置いていかれた展開","ここだけ別の話みたいに感じた展開",
+      "読んでいて一度止まった展開","「そこで切るの？」と思った展開","よく分からないまま進んだ展開",
+      "何が起きたか説明できないけど印象に残っている展開","ここは覚悟して読んだ展開",
+      "いちばん緊張した展開","いちばん安心した展開","あっさり終わったと感じた展開",
+      "終わり方が印象に残っている展開","読み終えたあと、一番思い返した展開",
+      "読み終えてから評価が変わった展開","結末を読んだあと、前の展開が違って見えたところ","早く終わってほしくなかった展開",
+      "もっと先を読みたかった展開","読みながら「まだ続くな」と思った展開"
+    ];
+
+    const outer = [
+      "どうしてこの本を手に取った？","どこでこの本を買った／手に入れた？","表紙や装丁、買う前に覚えてた？","読む前の期待","読み始めるまでに間はあった？",
+      "どこで読んでいた？","いつ読んでいた？","読み終えた場所はどこだった？","読んでいるときの明るさ","この本を読んだ日のことを覚えてる？",
+      "読み始めたときの状態","読んでいるときの体調","この本を読むのにちょうどいい日だった？","読むときの姿勢","読んでいるときの周りに人はいた？",
+      "読むスピード","どれくらいのペースで読んだ？","途中で読むのを中断した？","読書中、スマホを見た？","読んでいる途中で、別の本に手を出した？",
+      "読んでいるとき、何か食べたり飲んだりしてた？","読んでいるときの周りの音","この本を読む前、他に読んでいた本はあった？","読んでいるときの時間帯の感覚","読んでいるときの生活感（家／外／移動中など）",
+      "読み終えた直後、最初にしたこと","読み終えた瞬間","読み終えたあと、この本について","読み終えたあと、本をどうした？","この本は、今の自分にとってどうだった？"
+    ];
+
+    // ========= 乱数（シード付き） =========
+    function mulberry32(seed){
+      let t = seed >>> 0;
+      return function() {
+        t += 0x6D2B79F5;
+        let x = Math.imul(t ^ (t >>> 15), 1 | t);
+        x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+      }
+    }
+
+    function pickTwo(arr, rng){
+      const idx = [...arr.keys()];
+      // Fisher–Yates shuffle on indices
+      for (let i = idx.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [idx[i], idx[j]] = [idx[j], idx[i]];
+      }
+      return [arr[idx[0]], arr[idx[1]]];
+    }
+
+    // URL から seed を取得（整数でなければ無視）
+    function getSeedFromUrl(){
+      try {
+        const params = new URLSearchParams(location.search);
+        const s = params.get('seed');
+        if (!s) return null;
+        if (!/^\d+$/.test(s)) return null;
+        const n = Number(s);
+        return n % 1000000000;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // URL の seed を置き換える（履歴を汚さないよう replaceState）
+    function setSeedInUrl(seed){
+      try {
+        const params = new URLSearchParams(location.search);
+        params.set('seed', String(seed));
+        const newUrl = location.pathname + '?' + params.toString();
+        history.replaceState(null, '', newUrl);
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    const state = {
+      seed: getSeedFromUrl() ?? (Date.now() % 1000000000),
+      drawn: [], // {cat, q, id}
+    };
+
+    function updateSeedInfo(){
+      const el = document.getElementById("seedInfo");
+      el.textContent = `seed: ${state.seed}`;
+    }
+
+    function drawQuestions(){
+      const rng = mulberry32(state.seed);
+      const p = pickTwo(people, rng);
+      const t = pickTwo(plot, rng);
+      const o = pickTwo(outer, rng);
+
+      state.drawn = [
+        { cat:"人物", q:p[0] }, { cat:"人物", q:p[1] },
+        { cat:"展開", q:t[0] }, { cat:"展開", q:t[1] },
+        { cat:"外側", q:o[0] }, { cat:"外側", q:o[1] },
+      ].map((x, i) => ({...x, id: `q${i+1}`}));
+
+      // URL に反映（共有用）
+      setSeedInUrl(state.seed);
+      updateSeedInfo();
+
+      const root = document.getElementById("questions");
+      root.innerHTML = "";
+
+      for(const item of state.drawn){
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <div class="qhead">
+            <p class="qtitle">${item.q}</p>
+            <span class="pill">${item.cat}</span>
+          </div>
+          <textarea id="${item.id}" placeholder="名前 / 特徴 / 一言（空欄でもOK)"></textarea>
+        `;
+        root.appendChild(el);
+      }
+      // 結果表示は引き直し時に隠す
+      document.getElementById("resultArea").style.display = "none";
+    }
+
+    function makeResultCard(){
+      const now = new Date();
+      const meta = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")} / seed ${state.seed}`;
+      document.getElementById("meta").textContent = meta;
+
+      const body = document.getElementById("resultBody");
+      body.innerHTML = "";
+
+      // 1) 先頭に「最初に読んだ本」を入れる（あれば）
+      try {
+        const first = window.__readingMemo_firstBook ? window.__readingMemo_firstBook() : null;
+        if(first){
+          const fbWrap = document.createElement('div');
+          fbWrap.className = 'resultItem';
+          fbWrap.innerHTML = `
+            <div class="label">最初に読んだ本</div>
+            <div style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+              <img src="${first.cover || ''}" alt="cover" style="width:84px;height:120px;object-fit:cover;border:1px solid #ddd;border-radius:6px;">
+              <div>
+                <div style="font-weight:700">${escapeHtml(first.title || '')}</div>
+                <div style="color:#666;margin-top:6px">${escapeHtml([first.author||'', first.isbn ? 'ISBN: '+first.isbn : ''].filter(Boolean).join(' / '))}</div>
+              </div>
+            </div>
+          `;
+          body.appendChild(fbWrap);
+        }
+      } catch(e){
+        // ignore
+      }
+
+      // 2) 既存の質問回答を入れる
+      for(const item of state.drawn){
+        const ans = document.getElementById(item.id)?.value?.trim() ?? "";
+        const block = document.createElement("div");
+        block.className = "resultItem";
+        block.innerHTML = `
+          <div class="label">${item.cat}</div>
+          <div class="q">${item.q}</div>
+          <div class="a">${ans === "" ? "（空欄）" : escapeHtml(ans)}</div>
+        `;
+        body.appendChild(block);
+      }
+
+      document.getElementById("resultArea").style.display = "block";
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+
+    function escapeHtml(str){
+      return str
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;")
+        .replaceAll("\n","<br/>");
+    }
+
+    async function savePng(){
+      const area = document.getElementById("resultArea");
+      if(area.style.display === "none"){
+        makeResultCard();
+      }
+      // 少し待って描画安定
+      await new Promise(r => setTimeout(r, 250));
+
+      const canvas = await html2canvas(area, { scale: 2, backgroundColor: "#ffffff" });
+      const link = document.createElement("a");
+      link.download = `reading-memo_${state.seed}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    // ========= UI =========
+    document.getElementById("btnDraw").addEventListener("click", () => {
+      state.seed = (Date.now() + Math.floor(Math.random()*100000)) % 1000000000;
+      drawQuestions();
+    });
+    document.getElementById("btnMake").addEventListener("click", makeResultCard);
+    document.getElementById("btnPng").addEventListener("click", savePng);
+
+    // パーマリンクをコピー
+    document.getElementById("btnCopySeed").addEventListener("click", async () => {
+      const url = location.href;
+      const btn = document.getElementById("btnCopySeed");
+      try {
+        await navigator.clipboard.writeText(url);
+        const prev = btn.textContent;
+        btn.textContent = "コピーしまし��";
+        setTimeout(() => { btn.textContent = prev; }, 1400);
+      } catch (e) {
+        window.prompt("以下のURLをコピーしてください（Ctrl/Cmd+C）", url);
+      }
+    });
+
+    // 初期描画
+    drawQuestions();
+  })();
+  </script>
+</body>
+</html>
